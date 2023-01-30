@@ -1,5 +1,7 @@
 package com.example.gryapi.service;
 
+import com.example.gryapi.dto.GameDto;
+import com.example.gryapi.mapper.GameDtoMapper;
 import com.example.gryapi.model.GameEntity;
 import com.example.gryapi.model.GenreEntity;
 import com.example.gryapi.model.PublisherEntity;
@@ -22,10 +24,18 @@ public class GameService {
     private GenreRepository genreRepository;
 
     @Autowired
+    private GameDtoMapper gameDtoMapper;
+
+    @Autowired
     PublisherRepository publisherRepository;
+
     @Cacheable(value = "games", key = "#id")
-    public Optional<GameEntity> getById(Long id){
-        return gameRepository.findById(id);
+    public Optional<GameDto> getById(Long id){
+        Optional<GameEntity> byId = gameRepository.findById(id);
+        if (byId.isEmpty()){
+            return Optional.empty();
+        }
+        return Optional.of(gameDtoMapper.map(byId.get()));
     }
 
     public Long createGame(String title, int publishYear, Long publisherId, Long genreId){
@@ -34,7 +44,6 @@ public class GameService {
         if (publisher.isEmpty() || genre.isEmpty()) {
             throw new IllegalArgumentException("Publisher or genre not found in database");
         }
-
         GameEntity newGame = new GameEntity(
                 title,
                 publishYear,
@@ -44,8 +53,32 @@ public class GameService {
         gameRepository.save(newGame);
         return newGame.getId();
     }
+
     @CacheEvict(value = "games", key = "#id")
     public void deleteGame(Long id){
         gameRepository.deleteById(id);
     }
+
+    @CacheEvict(value = "games", key = "#id")
+    public GameDto updateGame(Long id, String title, int publisherYear, Long publisherId, Long genreId){
+        Optional<GameEntity> entity = gameRepository.findById(id);
+        if (entity.isEmpty()){
+            throw new IllegalArgumentException("GameEntity with id = " + id + " does not exist");
+        }
+
+        Optional<PublisherEntity> publisher = publisherRepository.findById(publisherId);
+        Optional<GenreEntity> genre = genreRepository.findById(genreId);
+        if (publisher.isEmpty() || genre.isEmpty()) {
+            throw new IllegalArgumentException("Publisher or genre not found in database");
+        }
+
+        GameEntity gameEntity = entity.get();
+        gameEntity.setTitle(title);
+        gameEntity.setPublishYear(publisherYear);
+        gameEntity.setPublisher(publisher.get());
+        gameEntity.setGenre(genre.get());
+        gameRepository.save(gameEntity);
+        return gameDtoMapper.map(gameEntity);
+    }
+
 }

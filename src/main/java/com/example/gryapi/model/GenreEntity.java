@@ -43,4 +43,12 @@ public class GenreEntity implements Serializable {
    public String getAltName() {
       return altName;
    }
+
+   public void setName(String name) {
+      this.name = name;
+   }
+
+   public void setAltName(String altName) {
+      this.altName = altName;
+   }
 }

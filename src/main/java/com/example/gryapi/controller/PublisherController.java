@@ -2,8 +2,7 @@ package com.example.gryapi.controller;
 
 import com.example.gryapi.dto.CreatePublisherDto;
 import com.example.gryapi.dto.PublisherDto;
-import com.example.gryapi.mapper.PublisherDtoMapper;
-import com.example.gryapi.model.PublisherEntity;
+import com.example.gryapi.dto.UpdatePublisherDto;
 import com.example.gryapi.service.PublisherService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -23,20 +22,18 @@ public class PublisherController {
 
     @Autowired
     private PublisherService publisherService;
-    @Autowired
-    private PublisherDtoMapper publisherDtoMapper;
 
     @GetMapping("/{id}")
-    public @ResponseBody ResponseEntity<PublisherDto> getPublisherEntity(@PathVariable Long id){
-        Optional<PublisherEntity> publisherEntity = publisherService.getById(id);
-        if(publisherEntity.isEmpty()){
+    public @ResponseBody ResponseEntity<PublisherDto> getPublisherEntity(@PathVariable Long id) {
+        Optional<PublisherDto> publisherDto = publisherService.getById(id);
+        if (publisherDto.isEmpty()) {
             return new ResponseEntity<>(HttpStatusCode.valueOf(404));
         }
-        return ResponseEntity.ok(publisherDtoMapper.map(publisherEntity.get()));
+        return ResponseEntity.ok(publisherDto.get());
     }
 
     @PostMapping
-    public Long createPublisherEntity(@Valid @RequestBody CreatePublisherDto createPublisherDto){
+    public Long createPublisherEntity(@Valid @RequestBody CreatePublisherDto createPublisherDto) {
         logger.info("Creating new publisherEntity");
         return publisherService.createPublisher(
                 createPublisherDto.getName(),
@@ -47,13 +44,29 @@ public class PublisherController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deletePublisher(@PathVariable Long id){
+    public ResponseEntity<Object> deletePublisher(@PathVariable Long id) {
         logger.info("Deleting publisherEntity with id = " + id);
         try {
             publisherService.deletePublisher(id);
             return ResponseEntity.ok(null);
-        } catch (EmptyResultDataAccessException e){
+        } catch (EmptyResultDataAccessException e) {
             return new ResponseEntity<>("Publisher with id = " + id + " does not exist", HttpStatusCode.valueOf(400));
+        }
+    }
+
+    @PutMapping
+    public ResponseEntity<Object> updatePublisher(@Valid @RequestBody UpdatePublisherDto updatePublisherDto) {
+        logger.info("Updating publisherEntity with id = " + updatePublisherDto.getId());
+        try {
+            return ResponseEntity.ok(publisherService.updatePublisher(
+                    updatePublisherDto.getId(),
+                    updatePublisherDto.getName(),
+                    updatePublisherDto.getCountry(),
+                    updatePublisherDto.getNumberOfEmployees(),
+                    updatePublisherDto.getFoundationYear()
+            ));
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatusCode.valueOf(400));
         }
     }
 }

@@ -2,6 +2,7 @@ package com.example.gryapi.controller;
 
 import com.example.gryapi.dto.CreateGenreDto;
 import com.example.gryapi.dto.GenreDto;
+import com.example.gryapi.dto.UpdateGenreDto;
 import com.example.gryapi.mapper.GenreDtoMapper;
 import com.example.gryapi.model.GenreEntity;
 import com.example.gryapi.service.GenreService;
@@ -52,6 +53,19 @@ public class GenreController {
             return ResponseEntity.ok(null);
         } catch (EmptyResultDataAccessException e){
             return new ResponseEntity<>("Genre with id = " + id + " does not exist", HttpStatusCode.valueOf(400));
+        }
+    }
+    @PutMapping
+    public ResponseEntity<Object> updateGenre(@Valid @RequestBody UpdateGenreDto updateGenreDto) {
+        logger.info("Updating genreEntity with id = " + updateGenreDto.getId());
+        try {
+            return ResponseEntity.ok(genreService.updateGenre(
+                    updateGenreDto.getId(),
+                    updateGenreDto.getName(),
+                    updateGenreDto.getAltName()
+            ));
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatusCode.valueOf(400));
         }
     }
 }

@@ -6,6 +6,14 @@ import java.io.Serializable;
 
 @Entity
 public class GameEntity implements Serializable {
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setPublishYear(int publishYear) {
+        this.publishYear = publishYear;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)

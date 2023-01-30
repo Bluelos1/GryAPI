@@ -3,7 +3,9 @@ package com.example.gryapi.dto;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
-public class CreateGameDto {
+public class UpdateGameDto {
+    @NotNull
+    private Long id;
     @NotNull
     private String title;
     @Min(1800)
@@ -13,11 +15,8 @@ public class CreateGameDto {
     @Min(1)
     private Long genreId;
 
-    public CreateGameDto(String title, int publishYear, Long publisherId, Long genreId) {
-        this.title = title;
-        this.publishYear = publishYear;
-        this.publisherId = publisherId;
-        this.genreId = genreId;
+    public Long getId() {
+        return id;
     }
 
     public String getTitle() {
@@ -36,6 +35,3 @@ public class CreateGameDto {
         return genreId;
     }
 }
-
-
-

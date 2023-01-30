@@ -14,6 +14,23 @@ public class PublisherEntity implements Serializable {
     private String name;
     private String country;
     private int numberOfEmployees;
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public void setNumberOfEmployees(int numberOfEmployees) {
+        this.numberOfEmployees = numberOfEmployees;
+    }
+
+    public void setFoundationYear(int foundationYear) {
+        this.foundationYear = foundationYear;
+    }
+
     private int foundationYear;
 
     public PublisherEntity(Long id, String name, String country, int numberOfEmployees, int foundationYear) {

@@ -23,9 +23,24 @@ public class GenreService {
         genreRepository.save(newGenre);
         return newGenre.getId();
     }
+
     @CacheEvict(value = "genres", key = "#id")
     public void deleteGenre(Long id){
         genreRepository.deleteById(id);
     }
+
+    @CacheEvict(value = "genres", key = "#id")
+    public GenreEntity updateGenre(Long id, String name, String altName){
+        Optional<GenreEntity> entity = genreRepository.findById(id);
+        if (entity.isEmpty()){
+            throw new IllegalArgumentException("GenreEntity with id = " + id + " does not exist");
+        }
+        GenreEntity genreEntity = entity.get();
+        genreEntity.setName(name);
+        genreEntity.setAltName(altName);
+        genreRepository.save(genreEntity);
+        return genreEntity;
+    }
+
 }
 
